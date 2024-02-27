@@ -1,0 +1,78 @@
+/* Basic reset */
+body, h1, h2, h6, input, button {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Container styles */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Title styles */
+#title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Input styles */
+input[type="text"] {
+  width: calc(100% - 80px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Button styles */
+button {
+  padding: 5px 7px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Button hover styles */
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Chat bubble styles */
+.chat-bubble {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* User reply styles */
+.user-reply {
+  background-color: #e6f7ff;
+}
+
+/* Chatbot reply styles */
+.chatbot-reply {
+  background-color: #f0f0f0;
+}
+
+.chat {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.replylist {
+  height: 100%; /* Adjusted height to fill the container */
+  overflow-y: auto; /* Allow vertical scrolling if content exceeds container height */
+}
+
+.clearButton{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
