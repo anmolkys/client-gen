@@ -2,6 +2,8 @@ import { useState , useEffect } from "react"
 import axios from "axios";
 import Pdf from "./Components/Pdf";
 import Reply from "./Components/Reply";
+import { documentToPlainTextString } from '@contentful/rich-text-plain-text-renderer';
+import ImageUploader from "./Components/ImageUploader";
 import "./App.css"
 
 const App = () => {
@@ -19,21 +21,25 @@ const App = () => {
   const [buttonText,setButton] = useState("Ask");
 
   function ask() {
-    setButton("Loading...")
+    setButton("⚡Loading")
+    setIsAskButtonDisabled(true);
     axios.post('https://letthemcook-production.up.railway.app/ask', {
       text: parsedText,
       question: question
     })
       .then(response => {
         console.log('Response:', response.data);
-        setReply(response.data.output);
-        setList(prevList => [...prevList, response.data.output]);
+        let richText = documentToPlainTextString(response.data.output)
+        setReply(richText);
+        setList(prevList => [...prevList, documentToPlainTextString(response.data.output)]);
         setQuestion("");
         setButton("Ask")
+        setIsAskButtonDisabled(false)
       })
       .catch(error => {
         console.error('Error:', error);
         setButton("Try Again?")
+        setIsAskButtonDisabled(false)
       })
   }
 
@@ -42,19 +48,22 @@ const App = () => {
   }
 
   function summarise(){
-    setSummary("Loading...")
+    setSummary("⚡Loading")
     axios.post('https://letthemcook-production.up.railway.app/summary', {
       text: parsedText,
     })
       .then(response => {
         console.log('Response:', response.data);
-        setSummary(response.data.output);
+        let richText = documentToPlainTextString(response.data.output)
+        setSummary(richText);
       })
       .catch(error => {
         console.error('Error:', error);
         setSummary(error)
       })
   }
+
+
 
   useEffect(() => {
     // Debounce the summarise function for parsedText
@@ -66,11 +75,25 @@ const App = () => {
     }, 500); // Adjust the delay time as needed
   }, [parsedText]);
 
+  const [dataFromChild, setDataFromChild] = useState('');
+
+  const handleDataFromChild = (data) => {
+    setDataFromChild(data);
+  };
+
+  useEffect(()=>{
+    setList(prevList => [...prevList, dataFromChild]);
+  },[dataFromChild])
+
+  const [isAskButtonDisabled,setIsAskButtonDisabled] = useState(false);
+
   return (
     <div className="container"> 
       <h1 id="title">Chat with PDF</h1>
-
-      <Pdf onParse={handleParse}></Pdf>
+      <div id="upload">
+        <Pdf onParse={handleParse}></Pdf>
+        <ImageUploader onData={handleDataFromChild}></ImageUploader>
+      </div>
       <h5>Summary: {summary}</h5>
       <button onClick={clearList} className="clearButton">Clear</button>
       <ul className="replylist">
@@ -80,7 +103,7 @@ const App = () => {
       </ul>
       <div className="chat">
       <input type="text" value={question} onChange={(e) => { setQuestion(e.target.value) }}></input>
-      <button onClick={ask}>{buttonText}</button>
+      <button onClick={ask} disabled={isAskButtonDisabled}>{buttonText}</button>
       </div>
     </div>
   )

@@ -15,26 +15,39 @@ const Pdf = ({ onParse }) => {
         const pdfData = new Uint8Array(event.target.result);
         extractTextFromPdf(pdfData);
       };
-      reader.readAsArrayBuffer(file);
+      try{
+        reader.readAsArrayBuffer(file);
+      }
+      catch(error){
+        console.log(error);
+      }
+      
     }
   
     async function extractTextFromPdf(pdfData) {
-      const pdfDoc = await pdfjs.getDocument(pdfData).promise;
-      const numPages = pdfDoc.numPages;
-      let pdfText = "";
+      try {
+        const pdfDoc = await pdfjs.getDocument(pdfData).promise;
+        const numPages = pdfDoc.numPages;
+        let pdfText = "";
   
-      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-        const page = await pdfDoc.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item) => item.str).join("\n");
-        pdfText += pageText + "\n";
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          const page = await pdfDoc.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map((item) => item.str).join("\n");
+          pdfText += pageText + "\n";
+        }
+  
+        onParse(pdfText.trim());
+      } catch (error) {
+        console.error("Error extracting text from PDF:", error);
+        // Provide user feedback about the error
+        alert("Failed to parse PDF. Please check if the PDF file is valid.");
       }
-  
-      onParse(pdfText.trim());
     }
   
     return (
-      <div>
+      <div id="pdf">
+        <label>PDF Upload: </label>
         <input type="file" onChange={handleFileUpload} />
       </div>
     );
